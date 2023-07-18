@@ -50,6 +50,45 @@ const resolvers = {
       return db.authors.find((author) => author.id === parent.author_id)
     },
   },
+  Mutation: {
+    addGame: (
+      _: any,
+      args: { game: { title: string; platform: string[] } }
+    ) => {
+      const newGame = {
+        ...args.game,
+        id: Math.floor(Math.random() * 10000).toString(),
+      }
+      db.games.push(newGame)
+
+      return newGame
+    },
+    updateGame: (
+      _: any,
+      args: { id: string; edits: { title: string; platform: string[] } }
+    ) => {
+      const game = db.games.find((game) => game.id === args.id)
+
+      if (!game) {
+        throw new Error("Game not found")
+      }
+
+      const updatedGame = {
+        ...game,
+        ...args.edits,
+      }
+      db.games = db.games.map((game) =>
+        game.id === args.id ? updatedGame : game
+      )
+
+      return updatedGame
+    },
+    deleteGame: (_: any, args: { id: string }) => {
+      db.games = db.games.filter((game) => game.id !== args.id)
+
+      return db.games
+    },
+  },
 }
 
 // server setup
